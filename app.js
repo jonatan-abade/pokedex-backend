@@ -13,7 +13,7 @@ const handleRequest = (req, res) => {
 
     try {
         if (url === '/' && method === 'GET') {
-            res.end(JSON.stringify({ message: 'Bem vindo ao Pokedex!' }));
+            res.end(JSON.stringify('Bem vindo ao Pokedex!'));
         } else if (url === '/login' && method === 'POST') {
             let body = '';
             req.on('data', chunk => {
