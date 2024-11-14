@@ -1,5 +1,6 @@
 import https from 'https';
 import { connection } from './db_connection.js';
+import { error, log } from 'console';
 
 export function login(req, res) {
     let body = '';
@@ -11,11 +12,12 @@ export function login(req, res) {
         body = JSON.parse(body);
 
         connection.query('SELECT * FROM users WHERE email = ? AND password = ?', [body.email, body.senha], function (err, results) {
-            if (err) {
+
+            if (err) {               
                 res.writeHead(500);
                 return res.end(JSON.stringify({ message: 'Erro ao buscar usuário' }));
             }
-
+       
             if (results.length > 0) {
                 res.writeHead(200);
                 return res.end(JSON.stringify({ message: 'Usuário autenticado com sucessoo!' }));
