@@ -2,5 +2,9 @@
     "name": "pokedex",
     "version": "1.0.0",
     "main": "app.js",
-    "type": "module"
+    "type": "module",
+    "dependencies": {
+        "dotenv": "^16.4.5",
+        "mysql2": "^3.11.4"
+    }
 }
