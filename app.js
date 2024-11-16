@@ -20,7 +20,9 @@ const handleRequest = (req, res) => {
             functions.login(req, res);
         } else if (url === '/pokemons' && method === 'GET') {
             functions.listPokemons(req, res);
-        } else {
+        } else if (url === '/redefinir-senha' && method === 'POST') {
+            functions.redefinirSenha(req,res);
+        }else {
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('Página não encontrada');
         }
