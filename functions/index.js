@@ -1,6 +1,5 @@
 import https from 'https';
 import { connection } from './db_connection.js';
-import { error, log } from 'console';
 
 export function login(req, res) {
     let body = '';
@@ -42,14 +41,14 @@ export function redefinirSenha(req, res) {
                 return res.end(JSON.stringify({ message: 'Usuário não encontrado!' }));
             }
             if (results.length > 0) { 
-            //     connection.query('UPDATE users SET password = ?WHERE email = ?', [body.senha,body.email], function (err, updateResults) {
-            //         if (err) {
-            //             res.writeHead(500);
-            //             return res.end(JSON.stringify({ message: 'Erro ao atualizar senha' }));
-            //         }
-            //         res.writeHead(200);
-            //         return res.end(JSON.stringify({ message: 'Senha redefinida com sucesso!' }));
-            //     });
+                connection.query('UPDATE users SET password = ?WHERE email = ?', [body.senha,body.email], function (err, updateResults) {
+                    if (err) {
+                        res.writeHead(500);
+                        return res.end(JSON.stringify({ message: 'Erro ao atualizar senha' }));
+                    }
+                    res.writeHead(200);
+                    return res.end(JSON.stringify({ message: 'Senha redefinida com sucesso!' }));
+                });
             } else {
                 res.writeHead(401);
                 return res.end(JSON.stringify({ message: 'Usuário inválido!' }));
