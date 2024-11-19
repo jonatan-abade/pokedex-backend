@@ -1,5 +1,6 @@
 import https from 'https';
 import { connection } from './db_connection.js';
+import crypto from 'crypto';
 
 export function login(req, res) {
     let body = '';
@@ -10,7 +11,9 @@ export function login(req, res) {
     req.on('end', () => {
         body = JSON.parse(body);
 
-        connection.query('SELECT * FROM users WHERE email = ? AND password = ?', [body.email, body.senha], function (err, results) {
+        let senha = crypto.createHash('sha256').update(body.senha.toString()).digest('hex');
+
+        connection.query('SELECT * FROM users WHERE email = ? AND password = ?', [body.email, senha], function (err, results) {
 
             if (err) {
                 res.writeHead(500);
@@ -34,14 +37,37 @@ export function redefinirSenha(req, res) {
     req.on('end', () => {
         body = JSON.parse(body);
 
+        if (!body.email) {
+            res.writeHead(400);
+            return res.end(JSON.stringify({ message: 'Email não informado' }));
+        }
+
+        if (!body.senha) {
+            res.writeHead(400);
+            return res.end(JSON.stringify({ message: 'Senha não informada' }));
+        }
+        let senha = body.senha.toString();
+
+        if (body.senha.length < 6) {
+            res.writeHead(400);
+            return res.end(JSON.stringify({ message: 'A deve ter no mínimo 6 caracteres' }));
+        }
+
+        senha = crypto.createHash('sha256').update(senha).digest('hex');
+
         connection.query(`SELECT * FROM users WHERE email = ?`, [body.email], function (err, results) {
 
             if (err) {
                 res.writeHead(500);
                 return res.end(JSON.stringify({ message: 'Usuário não encontrado!' }));
             }
-            if (results.length > 0) { 
-                connection.query('UPDATE users SET password = ?WHERE email = ?', [body.senha,body.email], function (err, updateResults) {
+            if (results.length > 0) {
+                if (results[0].password === senha) {
+                    res.writeHead(400);
+                    return res.end(JSON.stringify({ message: 'A nova senha não pode ser igual a antiga!' }));
+                }
+
+                connection.query('UPDATE users SET password = ? WHERE email = ?', [senha, body.email], function (err, updateResults) {
                     if (err) {
                         res.writeHead(500);
                         return res.end(JSON.stringify({ message: 'Erro ao atualizar senha' }));
