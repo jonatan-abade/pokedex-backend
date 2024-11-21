@@ -1,6 +1,7 @@
 import https from 'https';
 import { connection } from './db_connection.js';
 import crypto from 'crypto';
+import nodemailer from 'nodemailer'
 
 export function login(req, res) {
     let body = '';
@@ -30,6 +31,34 @@ export function login(req, res) {
     });
 }
 export function redefinirSenha(req, res) {
+    let transport = nodemailer.createTransport({
+        host: "sandbox.smtp.mailtrap.io",
+        port: 2525,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    });
+
+    let mailOptions = {
+        from: '',
+        to: 'myfriend@yahoo.com',
+        subject: 'Sending Email using Node.js',
+        text: 'That was easy!'
+    };
+
+    transport.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+
+    return res.end(JSON.stringify({ message: 'Email enviado com sucesso!' }));
+
+
+
     let body = '';
     req.on('data', chunk => {
         body += chunk.toString();
