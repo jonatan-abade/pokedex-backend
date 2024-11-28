@@ -30,6 +30,68 @@ export function login(req, res) {
         });
     });
 }
+export function sendmail(req,res){
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        body = JSON.parse(body);
+        
+        if (!body.email) {
+            res.writeHead(400);
+            return res.end(JSON.stringify({ message: 'Email não informado' }));
+        }
+
+        
+        connection.query(`SELECT * FROM users WHERE email = ?`, [body.email], function (err, results) {
+            
+        
+            if (results.length > 0) {
+
+        function generateToken() { return crypto.randomBytes(20).toString('hex'); }
+
+        const token = generateToken();
+
+        let transport = nodemailer.createTransport({
+            host: "sandbox.smtp.mailtrap.io",
+            port: 2525,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        let mailOptions = {
+            from: '',
+            to: 'myfriend@yahoo.com',
+            subject: 'Sending Email using Node.js',
+            text: ` TOKEN para redefinição de senha! 
+            
+            Siga as orientações abaixo. ☻
+
+                Para concluir a redefinição da sua senha, copie e cole o seguinte token na barra 'token' em sua página de redefinição.
+                    TOKEN: ${token} 
+        
+                    Caso erre o preenchimento do token na aplição, uma nova solicitação deve ser feita. `
+        };
+
+        transport.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
+
+        res.end(JSON.stringify({ message: 'Email enviado com sucesso!' }));
+    
+    }else{res.writeHead(500);
+                return res.end(JSON.stringify({ message: 'Email inválido!'}));
+
+    }});
+    })
+}
 export function redefinirSenha(req, res) {
 
     let body = '';
@@ -52,43 +114,6 @@ export function redefinirSenha(req, res) {
             }
             if (results.length > 0) {
 
-                function generateToken() { return crypto.randomBytes(20).toString('hex'); }
-                const token = generateToken();
-                let transport = nodemailer.createTransport({
-                    host: "sandbox.smtp.mailtrap.io",
-                    port: 2525,
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS
-                    }
-                });
-
-                let mailOptions = {
-                    from: '',
-                    to: 'myfriend@yahoo.com',
-                    subject: 'Sending Email using Node.js',
-                    text: ` TOKEN para redefinição de senha! 
-                    
-                    Siga as orientações abaixo. ☻
-
-                        Para concluir a solicitação de redefinição da sua senha, copie e cole o seguinte token na barra 'token' em sua página de redefinição.
-                            TOKEN: ${token} 
-                            Esse Token tem validade de 1 hora a partir do envio deste mail.
-                            Caso expire o prazo determinado, uma nova solicitação deve ser feita. `
-                };
-
-                transport.sendMail(mailOptions, function (error, info) {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        console.log('Email sent: ' + info.response);
-                    }
-                });
-
-                res.end(JSON.stringify({ message: 'Email enviado com sucesso!' }));
-
-                if (token === body.token) {
-                    body.senha.removeatribute("hidden")
                     if (!body.senha) {
                         res.writeHead(400);
                         return res.end(JSON.stringify({ message: 'Senha não informada' }));
@@ -114,17 +139,10 @@ export function redefinirSenha(req, res) {
                         res.writeHead(200);
                         return res.end(JSON.stringify({ message: 'Senha redefinida com sucesso!' }));
                     });
-                } else {
-                    res.writeHead(400);
-                    return res.end(JSON.stringify({ message: 'A nova senha não pode ser igual a antiga!' }));
-                }
+               
 
-            } else {
-                res.writeHead(401);
-                return res.end(JSON.stringify({ message: 'Token inválido, tente novamente!' }));
-            }
 
-        })
+    }});
 
     })
 }
