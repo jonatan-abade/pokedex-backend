@@ -6,9 +6,10 @@ export const up = (knex) => {
     return knex.schema.createTable('password_resets', table => {
         table.string('email').notNullable();
         table.string('token').notNullable();
-        table.timestamp('created_at').defaultTo(knex.fn.now());
-        table.timestamp('expired_at').defaultTo(knex.fn.now());
+        table.timestamp('created_at');
+        table.timestamp('expired_at');
     });
+    
 };
 
 /**

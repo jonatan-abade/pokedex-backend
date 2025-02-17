@@ -6,7 +6,9 @@
     "dependencies": {
         "dotenv": "^16.4.5",
         "knex": "^3.1.0",
-        "mysql2": "^3.11.4",
-        "nodemailer": "^6.9.16"
+        "mysql": "^2.18.1",
+        "mysql2": "^3.11.5",
+        "nodemailer": "^6.9.16",
+        "sqlite3": "^5.1.7"
     }
 }
