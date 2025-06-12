@@ -2,8 +2,6 @@ import https from 'https';
 import { connection } from './db_connection.js';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer'
-import knex from 'knex';
-import { timeStamp } from 'console';
 
 export function login(req, res) {
     let body = '';
@@ -83,9 +81,9 @@ export function sendmail(req, res) {
 
                         Para concluir a solicitação, clique no link, preencha corretamente os seus dados e confirme.
 
-                    LINK:   ${token} 
+                    LINK:   ${link} 
         
-                        Caso erre o preenchimento do token na aplição, uma nova solicitação deve ser feita. `
+                    Se você não solicitou a redefinição de senha, por favor, ignore este e-mail.`
                             };
 
                             transport.sendMail(mailOptions, function (error, info) {
